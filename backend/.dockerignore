@@ -1,8 +1,4 @@
+venv
 .git
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-Dockerfile
-.dockerignore
-README.md
+db.sqlite3
+.env
