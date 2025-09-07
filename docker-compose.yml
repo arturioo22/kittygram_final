@@ -32,3 +32,12 @@ services:
     volumes:
       - static_volume:/static
       - media_volume:/media
+
+  volumes:
+    pg_data:
+    static_volume:
+    media_volume:
+
+  networks:
+    kittygram_network:
+      driver: bridge
