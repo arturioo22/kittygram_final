@@ -14,7 +14,7 @@ RUN apt-get update \
     && pip install --no-cache-dir -r requirements.txt \
     && apt-get purge -y --auto-remove gcc
 
-# Копируем весь код проекта
+# Копируем весь код проекта!
 COPY . /app
 
 # Собираем статику
