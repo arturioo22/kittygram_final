@@ -16,6 +16,8 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=kittygram_backend.settings
     env_file: .env
+    ports:
+      - "9001:9000"
     volumes:
       - static_volume:/app/collected_static  # Исправленный путь
       - media_volume:/app/media
