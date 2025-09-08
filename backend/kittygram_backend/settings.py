@@ -9,11 +9,12 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # Уберите пробелы в ALLOWED_HOSTS
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv('ALLOWED_HOSTS', '').split(',') if host.strip()
-    ]
+    'kitykity.ddns.net',
+    '89.169.184.73',
+    'localhost',
+    '127.0.0.1'
+]
 
-# Уберите пробелы в CSRF_TRUSTED_ORIGINS
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
