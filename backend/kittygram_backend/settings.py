@@ -105,14 +105,14 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = '/app/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ВАЖНО: Выберите ОДИН из вариантов ниже
 
-# ВАРИАНТ 1: Полное отключение безопасности (для тестирования)
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
 }
 
 CSRF_USE_SESSIONS = False
