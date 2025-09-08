@@ -103,10 +103,22 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_gateway:latest
 
-  deploy:
+  deploy:  # ← ОТДЕЛЬНАЯ job, не внутри build-and-push!
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: List files in repository
+        run: |
+          echo "Содержимое репозитория:"
+          ls -la
+          echo "Содержимое корневой директории:"
+          ls -la ./
+          echo "Проверка конкретных файлов:"
+          ls -la docker-compose.yml nginx/ backend/ 2>/dev/null || echo "Некоторые файлы не найдены"
+
       - name: Copy entire project to server
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -114,7 +126,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "docker-compose.yml,nginx/nginx.conf,backend/kittygram_backend/settings.py,.env.example"
+          source: "docker-compose.yml,nginx/nginx.conf,backend/kittygram_backend/settings.py"
           target: "kittygram/"
 
       - name: Deploy to server
