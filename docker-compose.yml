@@ -33,10 +33,10 @@ services:
       - kittygram_network
 
   gateway:
-    image: arturioo22/kittygram_gateway:latest
+    build: ./nginx  # Собираем из Dockerfile
     container_name: kittygram_gateway
     ports:
-      - "9000:80"
+      - "80:80"  # Теперь на порт 80!
     volumes:
       - static_volume:/static
       - media_volume:/media
