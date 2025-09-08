@@ -141,3 +141,25 @@ CSRF_COOKIE_SECURE = True
 # Для простоты можно временно отключить CSRF
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_HTTPONLY = False
+CORS_ALLOW_ALL_ORIGINS = True  # временно для отладки
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
