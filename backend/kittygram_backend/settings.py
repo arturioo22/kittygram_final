@@ -120,46 +120,11 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "https://kitykity.ddns.net",
-    "http://localhost:3000",  # для разработки
-]
-
-CORS_ALLOW_CREDENTIALS = True
-
-# CSRF настройки  
-CSRF_TRUSTED_ORIGINS = [
-    "https://kitykity.ddns.net",
-]
-
-# Куки для cross-domain
-SESSION_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SAMESITE = 'None' 
-CSRF_COOKIE_SECURE = True
-
-# Для простоты можно временно отключить CSRF
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_HTTPONLY = False
-CORS_ALLOW_ALL_ORIGINS = True  # временно для отладки
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
-
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
+# Разрешите все CORS
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
