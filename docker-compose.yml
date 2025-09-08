@@ -17,7 +17,7 @@ services:
       - DJANGO_SETTINGS_MODULE=kittygram_backend.settings
     env_file: .env
     volumes:
-      - static_volume:/app/staticfiles
+      - static_volume:/app/collected_static  # Исправленный путь
       - media_volume:/app/media
     depends_on:
       - db
@@ -28,12 +28,12 @@ services:
     image: arturioo22/kittygram_frontend:latest
     container_name: kittygram_frontend
     volumes:
-      - static_volume:/app/frontend/static
+      - static_volume:/app/build  # ИСПРАВЛЕНО! Правильный путь
     networks:
       - kittygram_network
 
   gateway:
-    build: ./nginx  # Собираем из Dockerfile
+    build: ./nginx
     container_name: kittygram_gateway
     ports:
       - "9000:80"
