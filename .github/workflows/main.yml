@@ -4,9 +4,6 @@ on:
   push:
     branches: [ "main" ]
 
-env:
-  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -37,15 +34,11 @@ jobs:
     - name: Install dependencies
       run: |
         cd backend
+        pip install --upgrade pip setuptools
+        pip install flake8==6.0.0
         pip install -r requirements.txt
 
-    - name: Run flake8
-      run: |
-        cd backend
-        pip install flake8
-        flake8 .
-
-    - name: Run tests
+    - name: Run flake8 and tests
       env:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DEBUG: 0
@@ -57,12 +50,12 @@ jobs:
         ALLOWED_HOSTS: localhost,127.0.0.1
       run: |
         cd backend
+        python -m flake8 .
         python manage.py test
 
-  build-and-push:
+  build_and_push_backend:
     runs-on: ubuntu-latest
     needs: tests
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -82,8 +75,22 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_backend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_backend:latest
+
+  build_and_push_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push frontend
         uses: docker/build-push-action@v5
@@ -91,8 +98,22 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_frontend:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_frontend:latest
+
+  build_and_push_gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push gateway
         uses: docker/build-push-action@v5
@@ -100,33 +121,26 @@ jobs:
           context: ./nginx
           file: ./nginx/Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_gateway:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_gateway:latest
 
-  deploy:  # ← ОТДЕЛЬНАЯ job, не внутри build-and-push!
+  deploy:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: 
+      - build_and_push_backend
+      - build_and_push_frontend
+      - build_and_push_gateway
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: List files in repository
-        run: |
-          echo "Содержимое репозитория:"
-          ls -la
-          echo "Содержимое корневой директории:"
-          ls -la ./
-          echo "Проверка конкретных файлов:"
-          ls -la docker-compose.yml nginx/ backend/ 2>/dev/null || echo "Некоторые файлы не найдены"
-
-      - name: Copy entire project to server
+      - name: Copy files to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "docker-compose.yml,nginx/nginx.conf,backend/kittygram_backend/settings.py"
+          source: "docker-compose.yml,nginx/nginx.conf"
           target: "kittygram/"
 
       - name: Deploy to server
@@ -148,6 +162,10 @@ jobs:
             docker system prune -af
             docker logout
 
+  send_message:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
       - name: Send Telegram notification
         uses: appleboy/telegram-action@v1.0.0
         with:
