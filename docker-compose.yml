@@ -35,12 +35,12 @@ services:
     container_name: kittygram_frontend
     volumes:
       - static_volume:/app/build
-    command: sh -c "cp -r /app/build/* /app/build/ && npx -y http-server -p 8000 /app/build"
+    command: npx -y http-server -p 8000 /app/build
     networks:
       - kittygram_network
 
   gateway:
-    build: ./nginx
+    image: arturioo22/kittygram_gateway:latest
     container_name: kittygram_gateway
     ports:
       - "9000:80"
