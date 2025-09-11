@@ -168,7 +168,6 @@ jobs:
             sudo docker compose -f docker-compose.production.yml down
             # Сначала запустим только базу данных
             sudo docker compose -f docker-compose.production.yml up -d db
-            # Подождем, пока БД точно запустится
             sleep 10
             # Запустим бэкенд и применим миграции
             sudo docker compose -f docker-compose.production.yml up -d backend
