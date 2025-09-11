@@ -1,6 +1,4 @@
-volumes:
-  pg_data_production:
-  static_volume:
+version: '3.8'
 
 services:
   db:
@@ -8,21 +6,48 @@ services:
     env_file: .env
     volumes:
       - pg_data_production:/var/lib/postgresql/data
+    networks: # ДОБАВИТЬ СЕТЬ
+      - kittygram_network
+
   backend:
     image: arturioo22/kittygram_backend
     env_file: .env
     volumes:
-      - static_volume:/backend_static
+      - static_volume:/app/collected_static
+      - media_volume:/app/media # ДОБАВИТЬ ТОМ ДЛЯ МЕДИА
+    networks: # ДОБАВИТЬ СЕТЬ
+      - kittygram_network
+    depends_on: # ДОБАВИТЬ ЗАВИСИМОСТЬ
+      - db
+
   frontend:
     image: arturioo22/kittygram_frontend
-    env_file: .env
-    command: cp -r /app/build/. /frontend_static/
+    # ЗАМЕНИТЬ КОМАНДУ на правильную:
+    command: npx -y http-server -p 8000 /app/build
     volumes:
-      - static_volume:/frontend_static
+      - static_volume:/app/build
+    networks: # ДОБАВИТЬ СЕТЬ
+      - kittygram_network
+
   gateway:
     image: arturioo22/kittygram_gateway
     env_file: .env
     volumes:
-      - static_volume:/staticfiles/
+      - static_volume:/static
+      - media_volume:/media # ДОБАВИТЬ ТОМ ДЛЯ МЕДИА
     ports:
-      - 8000:80 
+      - 80:80 # Изменил на 80:80, так как внутри контейнера nginx слушает 80 порт
+    networks: # ДОБАВИТЬ СЕТЬ
+      - kittygram_network
+    depends_on: # ДОБАВИТЬ ЗАВИСИМОСТИ
+      - backend
+      - frontend
+
+volumes:
+  pg_data_production:
+  static_volume:
+  media_volume: # ДОБАВИТЬ ТОМ ДЛЯ МЕДИА
+
+networks: # ДОБАВИТЬ ЭТУ СЕКЦИЮ
+  kittygram_network:
+    driver: bridge

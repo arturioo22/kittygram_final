@@ -166,12 +166,16 @@ jobs:
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
             sudo docker compose -f docker-compose.production.yml pull
             sudo docker compose -f docker-compose.production.yml down
-            sudo docker compose -f docker-compose.production.yml up -d
+            # Сначала запустим только базу данных
+            sudo docker compose -f docker-compose.production.yml up -d db
+            # Подождем, пока БД точно запустится
             sleep 10
+            # Запустим бэкенд и применим миграции
+            sudo docker compose -f docker-compose.production.yml up -d backend
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate --noinput
             sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
-            sudo docker compose -f docker-compose.production.yml restart
-
+            # Теперь запустим всё остальное
+            sudo docker compose -f docker-compose.production.yml up -d
   # Отправка уведомления в Telegram
   send_message:
     runs-on: ubuntu-latest
