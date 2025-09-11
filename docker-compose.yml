@@ -1,6 +1,8 @@
 version: '3.8'
 
+# Сервисы (контейнеры)
 services:
+  # База данных PostgreSQL
   db:
     image: postgres:13
     container_name: kittygram_db
@@ -23,7 +25,7 @@ services:
     ports:
       - "9001:9000"
     volumes:
-      - static_volume:/app/collected_static  # Исправленный путь
+      - static_volume:/app/collected_static
       - media_volume:/app/media
     depends_on:
       - db
@@ -54,10 +56,11 @@ services:
     networks:
       - kittygram_network
 
+# УПРАВЛЕНИЕ ДАННЫМИ
 volumes:
-  pg_data:
-  static_volume:
-  media_volume:
+  pg_data:  # Том для PostgreSQL
+  static_volume:  # Том для статики
+  media_volume: # Том для медиа файлов
 
 networks:
   kittygram_network:
