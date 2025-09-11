@@ -29,6 +29,10 @@ jobs:
       with:
         python-version: 3.11
     
+    - name: Install system dependencies for Pillow
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev liblcms2-dev libwebp-dev
     # Установка зависимостей
     - name: Install dependencies
       run: |
