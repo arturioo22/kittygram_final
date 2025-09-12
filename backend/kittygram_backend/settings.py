@@ -7,12 +7,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-key-for-dev-only')
 
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS', 'kitygrammm.ddns.net,localhost,127.0.0.1').split(',')
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://kitygrammm.ddns.net',
-    'http://89.169.184.73',
-]
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://kitygrammm.ddns.net,http://localhost').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -113,9 +113,10 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOWED_ORIGINS = [
+    "http://kitygrammm.ddns.net",
+    "http://www.kitygrammm.ddns.net",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-
 CSRF_TRUSTED_ORIGINS = os.getenv(
     'CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1').split(',')
