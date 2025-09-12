@@ -8,17 +8,16 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-key-for-dev-only')
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
-    'kitykity.ddns.net',
-    'www.kitykity.ddns.net',
+    'kitygrammm.ddns.net',
+    'www.kitygrammm.ddns.net',
     '89.169.184.73',
     'localhost',
     '127.0.0.1'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
-    if origin.strip()
+    'https://kitygrammm.ddns.net',
+    'http://89.169.184.73',
 ]
 
 INSTALLED_APPS = [
