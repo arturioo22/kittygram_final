@@ -9,6 +9,7 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = [
     'kitykity.ddns.net',
+    'www.kitykity.ddns.net',
     '89.169.184.73',
     'localhost',
     '127.0.0.1'
