@@ -1,8 +1,6 @@
 version: '3.8'
 
-# Сервисы (контейнеры)
 services:
-  # База данных PostgreSQL
   db:
     image: postgres:13
     container_name: kittygram_db
@@ -37,7 +35,7 @@ services:
     container_name: kittygram_frontend
     volumes:
       - static_volume:/app/build
-    command: npx -y http-server -p 8000 /app/build
+    command: sh -c "cp -r /app/build/* /app/build/ && npx -y http-server -p 8000 /app/build"
     networks:
       - kittygram_network
 
@@ -56,11 +54,10 @@ services:
     networks:
       - kittygram_network
 
-# УПРАВЛЕНИЕ ДАННЫМИ
 volumes:
-  pg_data:  # Том для PostgreSQL
-  static_volume:  # Том для статики
-  media_volume: # Том для медиа файлов
+  pg_data:
+  static_volume:
+  media_volume:
 
 networks:
   kittygram_network:

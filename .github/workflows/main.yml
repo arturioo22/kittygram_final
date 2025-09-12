@@ -1,81 +1,75 @@
 name: Kittygram CI/CD
 
-# Условие запуска
 on:
   push:
-    branches:
-      - main # Запускается при пуше в ветку main
+    branches: ['main']
 
-# Запуск тестов
 jobs:
   tests:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13.10
+        image: postgres:13
         env:
-          POSTGRES_USER: kittygram_user
-          POSTGRES_PASSWORD: strong_password
-          POSTGRES_DB: kittygram
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-    
-    # Получение кода из репозитория
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
-    
-    - name: Install system dependencies for Pillow
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libjpeg-dev zlib1g-dev libtiff-dev libfreetype6-dev liblcms2-dev libwebp-dev
-    # Установка зависимостей
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip setuptools
-        pip install flake8==6.0.0 flake8-isort==6.0.0
-        pip install -r ./backend/requirements.txt
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    # Запуск проверки кода и тестов
-    - name: Test with flake8 and django tests
-      env:
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-        POSTGRES_DB: kittygram
-        POSTGRES_USER: kittygram_user
-        POSTGRES_PASSWORD: strong_password
-        DB_HOST: 127.0.0.1
-        DB_PORT: 5432
-      run: |
-        cd backend
-        python -m flake8 .
-        python manage.py test
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-  # Сборка и публикация backend
+      - name: 📦 Install dependencies
+        run: |
+          cd backend
+          pip install --upgrade pip setuptools
+          pip install flake8==6.0.0
+          pip install -r requirements.txt
+
+      - name: ✅ Run flake8 and tests
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          DEBUG: 0
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          ALLOWED_HOSTS: localhost,127.0.0.1
+        run: |
+          cd backend
+          python -m flake8 .
+          python manage.py test
+
   build_and_push_backend:
     runs-on: ubuntu-latest
     needs: tests
     steps:
-      # Получение кода из репозитория
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
-      
-      # Настройка Docker Buildx 
-      - name: Set up Docker Buildx
+
+      - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Авторизация в Docker Hub
-      - name: Login to DockerHub
+      - name: 🔐 Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Сборка и публикация образа
-      - name: Build and push backend
+      - name: 🏗️ Build and push backend
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -83,24 +77,23 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_backend:latest
 
-  # Сборка и публикация frontend
   build_and_push_frontend:
     runs-on: ubuntu-latest
     needs: tests
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
+      - name: 🔐 Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push frontend
+      - name: 🏗️ Build and push frontend
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
@@ -108,24 +101,23 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_frontend:latest
 
-  # Сборка и публикация gateway
   build_and_push_gateway:
     runs-on: ubuntu-latest
     needs: tests
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to DockerHub
+      - name: 🔐 Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push gateway
+      - name: 🏗️ Build and push gateway
         uses: docker/build-push-action@v5
         with:
           context: ./nginx
@@ -133,7 +125,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/kittygram_gateway:latest
 
-  # Деплой на сервер
   deploy:
     runs-on: ubuntu-latest
     needs: 
@@ -141,21 +132,21 @@ jobs:
       - build_and_push_frontend
       - build_and_push_gateway
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy docker-compose.production.yml via ssh
-        uses: appleboy/scp-action@master
+      - name: 📤 Copy files to server
+        uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "docker-compose.production.yml,nginx/nginx.conf,.env"
+          source: "docker-compose.yml,docker-compose.production.yml,nginx/nginx.conf,.env,.env.production"
           target: "kittygram/"
 
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
+      - name: 🚀 Deploy to server
+        uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
@@ -164,29 +155,30 @@ jobs:
           script: |
             cd ~/kittygram
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            sudo docker compose -f docker-compose.production.yml pull
-            sudo docker compose -f docker-compose.production.yml down
-            # Сначала запустим только базу данных
-            sudo docker compose -f docker-compose.production.yml up -d db
+            
+            # Используем production compose файл
+            export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
+            docker compose -f docker-compose.production.yml pull
+            docker compose -f docker-compose.production.yml down
+            docker compose -f docker-compose.production.yml up -d
+            
             sleep 10
-            # Запустим бэкенд и применим миграции
-            sudo docker compose -f docker-compose.production.yml up -d backend
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate --noinput
-            sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
-            # Теперь запустим всё остальное
-            sudo docker compose -f docker-compose.production.yml up -d
-  # Отправка уведомления в Telegram
+            docker exec kittygram_backend_prod python manage.py migrate --noinput
+            docker exec kittygram_backend_prod python manage.py collectstatic --noinput
+            docker system prune -af
+            docker logout
+
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
     steps:
-      - name: Send message
-        uses: appleboy/telegram-action@master
+      - name: 📨 Send Telegram notification
+        uses: appleboy/telegram-action@v1.0.0
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
-            Kittygram успешно обновлен!
+            🚀 Kittygram успешно обновлен!
             Репозиторий: ${{ github.repository }}
             Коммит: ${{ github.sha }}
             Ссылка: https://${{ secrets.KITTYGRAM_DOMAIN }}
