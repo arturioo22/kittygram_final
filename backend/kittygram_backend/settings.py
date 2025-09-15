@@ -1,18 +1,27 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+from django.core.management.utils import get_random_secret_key
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-key-for-dev-only')
+SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS', 'kitygrammm.ddns.net,localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 CSRF_TRUSTED_ORIGINS = os.getenv(
     'CSRF_TRUSTED_ORIGINS',
-    'http://kitygrammm.ddns.net,http://localhost').split(',')
+    'http://localhost,http://127.0.0.1'
+).split(',')
+
+CORS_ALLOWED_ORIGINS = os.getenv(
+    'CORS_ALLOWED_ORIGINS',
+    'http://localhost:3000,http://127.0.0.1:3000'
+).split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,16 +67,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'kittygram_backend.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'kittygram'),
-        'USER': os.getenv('POSTGRES_USER', 'kittygram_user'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'strong_password'),
-        'HOST': os.getenv('DB_HOST', 'db'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+if os.getenv('USE_SQLITE', 'False').lower() == 'true':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'kittygram'),
+            'USER': os.getenv('POSTGRES_USER', 'kittygram_user'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'strong_password'),
+            'HOST': os.getenv('DB_HOST', 'db'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -111,12 +128,3 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
-
-CORS_ALLOWED_ORIGINS = [
-    "http://kitygrammm.ddns.net",
-    "http://www.kitygrammm.ddns.net",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    'CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1').split(',')

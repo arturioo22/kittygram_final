@@ -1,26 +1,74 @@
-#  Как работать с репозиторием финального задания
+# Kittygram - Социальная сеть для любителей котиков 🐱
 
-## Что нужно сделать
+## 📖 Описание проекта
 
-Настроить запуск проекта Kittygram в контейнерах и CI/CD с помощью GitHub Actions
+Kittygram — это полнофункциональная социальная сеть для обмена фотографиями и информацией о котиках. Пользователи могут создавать профили своих питомцев, добавлять достижения и просматривать котиков других пользователей.
 
-## Как проверить работу с помощью автотестов
+### Основные функции:
+- Публикация карточек котиков
+- Достижения питомцев
+- Система лайков и комментариев
+- Загрузка фотографий котиков
+- Docker-контейнеризация
+- CI/CD автоматизация
 
-В корне репозитория создайте файл tests.yml со следующим содержимым:
-```yaml
-repo_owner: ваш_логин_на_гитхабе
-kittygram_domain: полная ссылка (https://доменное_имя) на ваш проект Kittygram
-taski_domain: полная ссылка (https://доменное_имя) на ваш проект Taski
-dockerhub_username: ваш_логин_на_докерхабе
-```
+## 🛠️ Стек технологий
 
-Скопируйте содержимое файла `.github/workflows/main.yml` в файл `kittygram_workflow.yml` в корневой директории проекта.
+### Backend
+- **Django** - веб-фреймворк
+- **Django REST Framework** - построение REST API
+- **PostgreSQL** - реляционная база данных
+- **SQLite** — для разработки и тестирования
+- **Djoser** - аутентификация и управление пользователями
+- **Pillow** - работа с изображениями
+- **CORS headers** - кросс-доменные запросы
 
-Для локального запуска тестов создайте виртуальное окружение, установите в него зависимости из backend/requirements.txt и запустите в корневой директории проекта `pytest`.
+### Инфраструктура
+- **Docker** — контейнеризация
+- **Docker Compose** — оркестрация
+- **Nginx** — веб-сервер и прокси
+- **GitHub Actions** — CI/CD
+- **Docker Hub** — реестр образов
 
-## Чек-лист для проверки перед отправкой задания
+## 🚀 Развертывание проекта
 
-- Проект Taski доступен по доменному имени, указанному в `tests.yml`.
-- Проект Kittygram доступен по доменному имени, указанному в `tests.yml`.
-- Пуш в ветку main запускает тестирование и деплой Kittygram, а после успешного деплоя вам приходит сообщение в телеграм.
-- В корне проекта есть файл `kittygram_workflow.yml`.
+### Предварительные требования
+
+- Docker и Docker Compose
+- Python 3.8+ (для разработки)
+- Git
+
+### 1. Клонирование репозитория
+git clone <ссылка-на-репозиторий>
+cd kittygram
+
+### 2. Настройка переменных окружения
+Создайте файл .env в корневой директории:
+
+## env
+# Django
+SECRET_KEY=your-super-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=kitygrammm.ddns.net,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=http://kitygrammm.ddns.net,http://www.kitygrammm.ddns.net,http://89.169.184.73
+CORS_ALLOWED_ORIGINS=http://kitygrammm.ddns.net,http://www.kitygrammm.ddns.net
+
+# Database
+POSTGRES_DB= DB_name
+POSTGRES_USER= DB_user_name
+POSTGRES_PASSWORD=DB_pas
+DB_HOST=db
+DB_PORT=5432
+### 3. Запуск с помощью Docker
+docker-compose up -d --build
+### 4. Применение миграций
+docker-compose exec backend python manage.py migrate
+### 5. Сбор статических файлов
+docker-compose exec backend python manage.py collectstatic --no-input
+
+### 👤 Автор
+Фисунов Артур
+
+Email: fisunov.arthur@yandex.ru
+
+GitHub: arturioo22
