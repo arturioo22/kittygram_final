@@ -1,32 +1,18 @@
 import os
 from pathlib import Path
-from dotenv import load_dotenv
-from django.core.management.utils import get_random_secret_key
-
-load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = os.getenv('SECRET_KEY', 'fallback-key-for-dev-only')
 
-def get_env_list(name, default=''):
-    value = os.getenv(name, default)
-    return [item.strip() for item in value.split(',') if item.strip()]
-
-
-SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = get_env_list('ALLOWED_HOSTS')
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS', 'kitygrammm.ddns.net,localhost,127.0.0.1').split(',')
 
-CSRF_TRUSTED_ORIGINS = get_env_list(
+CSRF_TRUSTED_ORIGINS = os.getenv(
     'CSRF_TRUSTED_ORIGINS',
-    'http://localhost,http://127.0.0.1'
-)
-
-CORS_ALLOWED_ORIGINS = get_env_list(
-    'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000'
-)
+    'http://kitygrammm.ddns.net,http://localhost').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -53,7 +39,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'kittygram_backend.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -72,24 +57,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'kittygram_backend.wsgi.application'
 
-if os.getenv('USE_SQLITE', 'False').lower() == 'true':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'kittygram'),
+        'USER': os.getenv('POSTGRES_USER', 'kittygram_user'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'strong_password'),
+        'HOST': os.getenv('DB_HOST', 'db'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'kittygram'),
-            'USER': os.getenv('POSTGRES_USER', 'kittygram_user'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'strong_password'),
-            'HOST': os.getenv('DB_HOST', 'db'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-        }
-    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -133,3 +110,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://kitygrammm.ddns.net",
+    "http://www.kitygrammm.ddns.net",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1').split(',')
