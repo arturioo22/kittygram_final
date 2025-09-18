@@ -1,6 +1,6 @@
 # Kittygram - Социальная сеть для любителей котиков 🐱
 
-![CI/CD Status](https://github.com/arturioo22/kittygram_final/actions/workflows/kittygram.yml/badge.svg)
+![CI/CD Status](https://github.com/arturioo22/kittygram_final/actions/workflows/main.yml/badge.svg)
 ![Docker](https://img.shields.io/badge/Docker-✓-blue.svg)
 ![Django](https://img.shields.io/badge/Django-3.2-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-✓-blue.svg)
