@@ -20,12 +20,12 @@ services:
     container_name: kittygram_backend 
     environment: 
       - DJANGO_SETTINGS_MODULE=kittygram_backend.settings 
-    env_file: .env 
     ports: 
       - "9001:9000" 
     volumes: 
       - static_volume:/app/collected_static 
-      - media_volume:/app/media 
+      - media_volume:/app/media
+      - ./.env:/app/.env
     depends_on: 
       - db 
     networks: 
