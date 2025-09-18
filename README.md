@@ -1,5 +1,10 @@
 # Kittygram - Социальная сеть для любителей котиков 🐱
 
+![CI/CD Status](https://github.com/arturioo22/kittygram_final/actions/workflows/kittygram.yml/badge.svg)
+![Docker](https://img.shields.io/badge/Docker-✓-blue.svg)
+![Django](https://img.shields.io/badge/Django-3.2-green.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-✓-blue.svg)
+
 ## 📖 Описание проекта
 
 Kittygram — это полнофункциональная социальная сеть для обмена фотографиями и информацией о котиках. Пользователи могут создавать профили своих питомцев, добавлять достижения и просматривать котиков других пользователей.
@@ -72,3 +77,10 @@ docker-compose exec backend python manage.py collectstatic --no-input
 Email: fisunov.arthur@yandex.ru
 
 GitHub: arturioo22
+
+## 🔗 Ссылки для проверки:
+
+- **Репозиторий:** https://github.com/arturioo22/kittygram_final
+- **Workflow:** https://github.com/arturioo22/kittygram_final/actions
+- **Production:** https://kitygrammm.ddns.net
+- **Docker Hub:** https://hub.docker.com/u/arturioo22
