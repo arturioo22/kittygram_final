@@ -24,7 +24,8 @@ services:
       - "9001:9000" 
     volumes: 
       - static_volume_prod:/app/collected_static 
-      - media_volume_prod:/app/media 
+      - media_volume_prod:/app/media
+      - ./.env:/app/.env
     depends_on: 
       - db 
     networks: 
